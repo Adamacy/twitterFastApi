@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class Token(BaseModel):
     access_token: str
@@ -6,6 +7,20 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+class TweetBase(BaseModel):
+    description: str
+    likes: int | None = None
+
+class TweetCreate(TweetBase):
+    pass
+
+class Tweet(TweetBase):
+    id: int
+    author_id: int
+
+    class Config:
+        orm_mode = True
 
 class UserBase(BaseModel):
     username: str
@@ -22,6 +37,8 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+
+    tweets: list[Tweet] = []
 
     class Config:
         orm_mode = True

@@ -18,3 +18,16 @@ def create_user(db: Session, user: schema.UserCreate):
     db.refresh(db_user)
 
     return db_user
+
+def get_tweets(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Tweet).offset(skip).limit(limit).all()
+
+def create_tweet(db: Session, tweet: schema.TweetCreate, author_id: int):
+
+    tweet = models.Tweet(description = tweet.description, author_id = author_id)
+
+    db.add(tweet)
+    db.commit()
+    db.refresh(tweet)
+
+    return tweet
