@@ -8,6 +8,7 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
 
+
 class TweetBase(BaseModel):
     description: str
     likes: int | None = None
@@ -21,6 +22,9 @@ class Tweet(TweetBase):
 
     class Config:
         orm_mode = True
+
+class TweetUpdate(BaseModel):
+    description: str | None = None
 
 class UserBase(BaseModel):
     username: str

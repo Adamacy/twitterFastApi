@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from app.db import get_db
 import app.models as models
 import app.schema as schema
@@ -24,10 +24,25 @@ def get_tweets(db: Session, skip: int = 0, limit: int = 100):
 
 def create_tweet(db: Session, tweet: schema.TweetCreate, author_id: int):
 
-    tweet = models.Tweet(description = tweet.description, author_id = author_id)
+    tweet = models.Tweet(description = tweet.description, likes = 0, author_id = author_id)
 
     db.add(tweet)
     db.commit()
     db.refresh(tweet)
 
     return tweet
+
+def update_tweet(db: Session, tweet_id: int, element: str, data: str | None = None):
+    db_tweet = db.query(models.Tweet).filter(models.Tweet.id == tweet_id).first()
+    if db_tweet is None:
+        return HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Tweet not found")
+    
+    if element == 'likes':
+        db_tweet.likes += 1
+
+    if element == 'description':
+
+        db_tweet.description = data
+    
+    db.commit()
+    db.refresh(db_tweet)
