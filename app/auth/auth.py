@@ -1,5 +1,5 @@
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import Depends, status
+from fastapi import Depends, status, Response
 from fastapi.exceptions import HTTPException
 from app.db import get_db
 from app.schema import TokenData, User
@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from passlib.context import CryptContext
 from fastapi import APIRouter
 from app import schema
+from uuid import uuid4, UUID
 
 router = APIRouter(
     prefix = '/v1',
@@ -92,8 +93,9 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     
     return current_user
 
+
 @router.post('/token', response_model=schema.Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db = db, username = form_data.username, password = form_data.password)
     if not user:
         raise HTTPException(
@@ -104,9 +106,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
     access_token = create_access_token(data = {"sub": user.username}, expires_delta = access_token_expires)
 
+    session = uuid4()
+
+    response.set_cookie("token", access_token, expires=14 * 24 * 60 * 60, httponly=True, secure=True, samesite='none')
+
     return {"access_token": access_token, "token_type": "bearer"}
-
-@router.get('/users/me/', response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
-

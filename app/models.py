@@ -13,16 +13,15 @@ class User(Base):
     email = Column(String(50), unique=True)
     password = Column(Text())
 
-    items = relationship("Tweet", back_populates='owner')
+    tweets = relationship("Tweet", back_populates='author')
 
 
 class Tweet(Base):
     __tablename__ = 'tweets'
 
     id = Column(Integer, primary_key = True, index=True)
-    title = Column(String(100), index=True)
     description = Column(String(500), index=True)
     likes = Column(Integer)
     author_id = Column(Integer, ForeignKey('users.id'))
 
-    owner = relationship("User", back_populates='items')
+    author = relationship("User", back_populates='tweets')
