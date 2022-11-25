@@ -43,7 +43,6 @@ def hash_password(password):
 def authenticate_user(username: str, password: str, db: Session = Depends(get_db)):
 
     user = crud.get_user_by_username(db = db, username = username)
-    
     if not user:
         return HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
     if not verify_password(password, user.password):
@@ -97,6 +96,7 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 @router.post('/token', response_model=schema.Token)
 async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db = db, username = form_data.username, password = form_data.password)
+    print(user)
     if not user:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,

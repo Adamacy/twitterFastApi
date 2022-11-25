@@ -7,8 +7,11 @@ import app.schema as schema
 from .auth import auth
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(models.User).filter(models.User.username == username).first()
+    db_user = db.query(models.User).filter(models.User.username == username).first()
 
+    return db_user
+
+    
 def create_user(db: Session, user: schema.UserCreate):
     
     hashed_password = auth.hash_password(user.password)

@@ -22,3 +22,4 @@ async def create_tweet_route(tweet: TweetCreate, current_user: User = Depends(ge
 @router.post('/{tweet_id}/{element}/update')
 def update_likes(tweet_id: int, element: str, data: TweetUpdate, db: Session = Depends(get_db)):
     return update_tweet(db = db, tweet_id = tweet_id, element = element, data = data.description)
+

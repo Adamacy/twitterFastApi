@@ -13,7 +13,8 @@ router = APIRouter(
 @router.post("/create")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = get_user_by_username(db = db, username = user.username)
-    if db_user:
+    print(db_user)
+    if db_user is None:
         return HTTPException(status.HTTP_403_FORBIDDEN, detail="User already exist")
     create_user(db = db, user = user)
     return HTTPException(status_code = status.HTTP_201_CREATED, detail="User has beed created")
@@ -21,3 +22,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.get('/me', response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
+
+@router.get("/{username}")
+def user_profile(username: str, db: Session = Depends(get_db)):
+    return get_user_by_username(db = db, username = username)
